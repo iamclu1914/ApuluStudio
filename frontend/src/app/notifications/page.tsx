@@ -120,7 +120,7 @@ export default function NotificationsPage() {
           <button
             onClick={() => setFilter("all")}
             className={cn(
-              "px-4 py-2 rounded-xl text-sm font-medium transition-all",
+              "px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-medium transition-all",
               filter === "all"
                 ? "bg-amber-100 text-amber-700"
                 : "bg-gray-100 text-gray-600 hover:bg-gray-200"
@@ -131,7 +131,7 @@ export default function NotificationsPage() {
           <button
             onClick={() => setFilter("unread")}
             className={cn(
-              "px-4 py-2 rounded-xl text-sm font-medium transition-all",
+              "px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-medium transition-all",
               filter === "unread"
                 ? "bg-amber-100 text-amber-700"
                 : "bg-gray-100 text-gray-600 hover:bg-gray-200"
@@ -157,30 +157,30 @@ export default function NotificationsPage() {
                     <li
                       key={notification.id}
                       className={cn(
-                        "p-5 hover:bg-gray-50/50 transition-colors cursor-pointer",
+                        "p-3.5 sm:p-5 hover:bg-gray-50/50 transition-colors cursor-pointer",
                         !notification.read && "bg-amber-50/30"
                       )}
                       onClick={() => markAsRead(notification.id)}
                     >
-                      <div className="flex items-start gap-4">
+                      <div className="flex items-start gap-3 sm:gap-4">
                         <div
                           className={cn(
-                            "p-2.5 rounded-xl",
+                            "p-2 sm:p-2.5 rounded-xl flex-shrink-0",
                             !notification.read
                               ? "bg-amber-100 text-amber-600"
                               : "bg-gray-100 text-gray-500"
                           )}
                         >
-                          <Icon className="w-5 h-5" />
+                          <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="font-semibold text-gray-900">
+                          <div className="flex items-center gap-2 mb-1 flex-wrap">
+                            <span className="font-semibold text-gray-900 text-sm sm:text-base">
                               {notification.title}
                             </span>
                             <PlatformBadge platform={notification.platform} size="sm" />
                             {!notification.read && (
-                              <span className="w-2 h-2 bg-amber-500 rounded-full" />
+                              <span className="w-2 h-2 bg-amber-500 rounded-full flex-shrink-0" />
                             )}
                           </div>
                           <p className="text-sm text-gray-600">{notification.message}</p>

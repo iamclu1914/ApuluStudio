@@ -192,7 +192,7 @@ function PostItem({ post }: { post: Post }) {
 
   if (isEditing) {
     return (
-      <li className="p-4 bg-surface-50">
+      <li className="p-3 sm:p-4 bg-surface-50">
         <div className="space-y-3">
           {/* Caption editor */}
           <textarea
@@ -204,7 +204,7 @@ function PostItem({ post }: { post: Post }) {
           />
 
           {/* Date and time pickers */}
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <div className="flex items-center gap-2">
               <Calendar className="w-4 h-4 text-surface-400" />
               <input
@@ -259,7 +259,7 @@ function PostItem({ post }: { post: Post }) {
           </div>
 
           {/* Action buttons */}
-          <div className="flex items-center justify-between pt-2 border-t border-surface-200">
+          <div className="flex items-center justify-between pt-2 border-t border-surface-200 flex-wrap gap-2">
             <button
               onClick={handleDeleteClick}
               disabled={deleteMutation.isPending}
@@ -304,10 +304,10 @@ function PostItem({ post }: { post: Post }) {
   }
 
   return (
-    <li className="p-4 hover:bg-surface-50 transition-colors group">
+    <li className="p-3 sm:p-4 hover:bg-surface-50 transition-colors group">
       <div className="flex items-start gap-3">
         {/* Thumbnail or placeholder */}
-        <div className="w-12 h-12 rounded-lg bg-surface-100 flex-shrink-0 flex items-center justify-center overflow-hidden">
+        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-surface-100 flex-shrink-0 flex items-center justify-center overflow-hidden">
           {post.thumbnail_url || (post.media_urls && post.media_urls[0]) ? (
             <img
               src={post.thumbnail_url || post.media_urls?.[0]}
@@ -325,7 +325,7 @@ function PostItem({ post }: { post: Post }) {
             {truncateText(post.content, 100)}
           </p>
 
-          <div className="flex items-center gap-3 mt-2">
+          <div className="flex items-center gap-2 sm:gap-3 mt-2 flex-wrap">
             {/* Platforms */}
             <div className="flex items-center gap-1">
               {post.platforms.map((pp) => (

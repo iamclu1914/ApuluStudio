@@ -302,11 +302,11 @@ export default function SettingsPage() {
               </div>
             </CardHeader>
             <CardContent className="space-y-5">
-              <div className="p-4 rounded-xl bg-blue-50 border border-blue-200">
+              <div className="p-3 sm:p-4 rounded-xl bg-blue-50 border border-blue-200">
                 <p className="text-sm text-blue-800">
                   <strong>How to get an App Password:</strong>
                 </p>
-                <ol className="text-sm text-blue-700 mt-2 space-y-1 list-decimal list-inside">
+                <ol className="text-sm text-blue-700 mt-2 space-y-1 list-decimal list-inside break-words">
                   <li>Go to <a
                     href="https://bsky.app/settings/app-passwords"
                     target="_blank"

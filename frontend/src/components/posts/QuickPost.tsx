@@ -521,19 +521,19 @@ export function QuickPost() {
                 )}
 
                 {/* Date/Time Picker - Compact */}
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                   <input
                     type="date"
                     value={scheduledDate}
                     onChange={(e) => setScheduledDate(e.target.value)}
                     min={new Date().toISOString().split("T")[0]}
-                    className="flex-1 px-3 py-2 bg-white border border-amber-200 rounded-lg focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 text-sm"
+                    className="flex-1 min-w-[140px] px-3 py-2 bg-white border border-amber-200 rounded-lg focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 text-sm"
                   />
                   <input
                     type="time"
                     value={scheduledTime}
                     onChange={(e) => setScheduledTime(e.target.value)}
-                    className="w-28 px-3 py-2 bg-white border border-amber-200 rounded-lg focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 text-sm"
+                    className="w-24 sm:w-28 px-3 py-2 bg-white border border-amber-200 rounded-lg focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 text-sm"
                   />
                   <Button
                     onClick={() => handleSubmit(true)}
@@ -574,7 +574,7 @@ export function QuickPost() {
                       onClick={() => isConnected && togglePlatform(platform)}
                       disabled={!isConnected}
                       className={cn(
-                        "relative flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border-2 transition-all duration-200 min-w-[130px]",
+                        "relative flex items-center justify-center gap-2 px-3 sm:px-4 py-2.5 rounded-xl border-2 transition-all duration-200 min-w-[110px] sm:min-w-[130px]",
                         isSelected
                           ? "border-amber-500 bg-amber-50 shadow-lg shadow-amber-500/10"
                           : "border-gray-200 hover:border-gray-300 bg-white",
@@ -624,7 +624,7 @@ export function QuickPost() {
                     <span className="hidden sm:inline">Emoji</span>
                   </Button>
                   {showEmojiPicker && (
-                    <div className="absolute bottom-full left-0 mb-2 z-50">
+                    <div className="absolute bottom-full left-0 mb-2 z-50 max-w-[calc(100vw-2rem)] overflow-hidden">
                       <Picker
                         data={data}
                         onEmojiSelect={handleEmojiSelect}

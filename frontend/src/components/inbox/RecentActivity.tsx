@@ -99,8 +99,8 @@ function ActivityItem({ item }: { item: InboxItem }) {
 
         {/* Content */}
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <span className="font-medium text-surface-900">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="font-medium text-surface-900 truncate max-w-[150px] sm:max-w-none">
               @{item.author_username}
             </span>
             <PlatformBadge platform={item.platform} size="sm" />
