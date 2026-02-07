@@ -19,6 +19,12 @@ const syne = Syne({
 export const metadata: Metadata = {
   title: "Apulu Studio - Social Media Command Center",
   description: "All-in-one social media management for solopreneurs",
+  icons: {
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+    ],
+    apple: "/apple-touch-icon.svg",
+  },
 };
 
 export default function RootLayout({
