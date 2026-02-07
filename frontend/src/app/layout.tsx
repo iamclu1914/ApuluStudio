@@ -1,10 +1,20 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Plus_Jakarta_Sans, Syne } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 import { Toaster } from "react-hot-toast";
 
-const inter = Inter({ subsets: ["latin"] });
+const plusJakarta = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  variable: "--font-body",
+  display: "swap",
+});
+
+const syne = Syne({
+  subsets: ["latin"],
+  variable: "--font-display",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "Apulu Studio - Social Media Command Center",
@@ -18,10 +28,15 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={`${plusJakarta.variable} ${syne.variable} font-sans antialiased`}>
         <Providers>
           {children}
-          <Toaster position="bottom-right" />
+          <Toaster
+            position="bottom-right"
+            toastOptions={{
+              className: "!rounded-xl !shadow-xl !border !border-gray-100 !text-sm",
+            }}
+          />
         </Providers>
       </body>
     </html>

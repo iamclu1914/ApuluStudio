@@ -40,13 +40,13 @@ export default function AnalyticsPage() {
     <DashboardLayout>
       <div className="space-y-8">
         {/* Header */}
-        <div className="flex items-center gap-4">
-          <div className="p-3 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-500 shadow-lg shadow-green-500/25">
-            <BarChart3 className="w-6 h-6 text-white" />
+        <div className="flex items-center gap-3 sm:gap-4">
+          <div className="p-2.5 sm:p-3 rounded-xl sm:rounded-2xl bg-gradient-to-br from-green-500 to-emerald-500 shadow-lg shadow-green-500/25">
+            <BarChart3 className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Analytics</h1>
-            <p className="text-gray-500 mt-1">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 font-display">Analytics</h1>
+            <p className="text-gray-500 mt-0.5 sm:mt-1 text-sm sm:text-base">
               Track your social media performance
             </p>
           </div>
@@ -89,7 +89,7 @@ export default function AnalyticsPage() {
             </div>
           </CardHeader>
           <CardContent className="pt-6">
-            <div className="h-[350px]">
+            <div className="h-[250px] sm:h-[350px]">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={chartData}>
                   <defs>

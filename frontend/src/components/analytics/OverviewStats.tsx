@@ -14,10 +14,10 @@ export function OverviewStats() {
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {[...Array(4)].map((_, i) => (
           <Card key={i} hover={false}>
-            <CardContent className="py-6">
+            <CardContent className="py-4 sm:py-6">
               <div className="animate-pulse space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="h-10 w-10 bg-gray-200 rounded-xl" />
@@ -74,19 +74,19 @@ export function OverviewStats() {
   ];
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
       {stats.map((stat) => (
         <Card key={stat.label} className="overflow-hidden">
-          <CardContent className="py-5 relative">
+          <CardContent className="py-4 sm:py-5 relative">
             {/* Background decoration */}
             <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${stat.bgGradient} rounded-full blur-3xl opacity-50 -translate-y-1/2 translate-x-1/2`} />
 
             <div className="relative">
-              <div className="flex items-center justify-between mb-4">
-                <div className={`p-2.5 rounded-xl bg-gradient-to-br ${stat.gradient} shadow-lg`}>
-                  <stat.icon className="w-5 h-5 text-white" />
+              <div className="flex items-center justify-between mb-3 sm:mb-4">
+                <div className={`p-2 sm:p-2.5 rounded-lg sm:rounded-xl bg-gradient-to-br ${stat.gradient} shadow-lg`}>
+                  <stat.icon className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                 </div>
-                <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
+                <div className={`flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-medium ${
                   stat.isPositive
                     ? "bg-green-100 text-green-700"
                     : "bg-red-100 text-red-700"
@@ -100,10 +100,10 @@ export function OverviewStats() {
                 </div>
               </div>
 
-              <p className="text-3xl font-bold text-gray-900">
+              <p className="text-xl sm:text-3xl font-bold text-gray-900">
                 {stat.isPercentage ? stat.value : formatNumber(Number(stat.value))}
               </p>
-              <p className="text-sm text-gray-500 mt-1">{stat.label}</p>
+              <p className="text-xs sm:text-sm text-gray-500 mt-1">{stat.label}</p>
             </div>
           </CardContent>
         </Card>

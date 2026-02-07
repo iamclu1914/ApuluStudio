@@ -56,8 +56,8 @@ const config: Config = {
         },
       },
       fontFamily: {
-        sans: ["Plus Jakarta Sans", "system-ui", "sans-serif"],
-        display: ["Syne", "system-ui", "sans-serif"],
+        sans: ["var(--font-body)", "Plus Jakarta Sans", "system-ui", "sans-serif"],
+        display: ["var(--font-display)", "Syne", "system-ui", "sans-serif"],
       },
       fontSize: {
         "2xs": ["0.625rem", { lineHeight: "0.875rem" }],

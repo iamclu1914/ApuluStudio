@@ -84,7 +84,7 @@ function PlatformIcon({ children, delay }: { children: React.ReactNode; delay: n
   return (
     <div
       className={cn(
-        "w-14 h-14 rounded-2xl bg-white/[0.03] backdrop-blur-sm border border-amber-500/20 flex items-center justify-center transition-all duration-500 hover:scale-110 hover:bg-amber-500/10 hover:border-amber-500/40",
+        "w-11 h-11 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-white/[0.03] backdrop-blur-sm border border-amber-500/20 flex items-center justify-center transition-all duration-500 hover:scale-110 hover:bg-amber-500/10 hover:border-amber-500/40",
         visible ? "opacity-100 scale-100" : "opacity-0 scale-50"
       )}
     >
@@ -200,27 +200,27 @@ export default function HomePage() {
       {/* Content */}
       <div className="relative z-10 min-h-screen flex flex-col">
         {/* Header */}
-        <header className="p-8">
+        <header className="p-4 sm:p-6 lg:p-8">
           <div
             className={cn(
               "flex items-center gap-3 transition-all duration-1000",
               mounted ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-8"
             )}
           >
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 via-yellow-500 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/30">
-              <Crown className="w-6 h-6 text-black" />
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-amber-400 via-yellow-500 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/30">
+              <Crown className="w-5 h-5 sm:w-6 sm:h-6 text-black" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-amber-50 tracking-tight">
+              <h1 className="text-lg sm:text-xl font-bold text-amber-50 tracking-tight font-display">
                 Apulu Studio
               </h1>
-              <p className="text-xs text-stone-500">Premium Social Media Suite</p>
+              <p className="text-[10px] sm:text-xs text-stone-500">Premium Social Media Suite</p>
             </div>
           </div>
         </header>
 
         {/* Main content */}
-        <main className="flex-1 flex flex-col items-center justify-center px-8 py-16">
+        <main className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
           {/* Hero section */}
           <div className="text-center max-w-4xl mx-auto mb-16">
             <div
@@ -236,7 +236,7 @@ export default function HomePage() {
 
             <h2
               className={cn(
-                "text-5xl md:text-7xl font-bold mb-6 transition-all duration-1000 tracking-tight",
+                "text-3xl sm:text-5xl md:text-7xl font-bold mb-4 sm:mb-6 transition-all duration-1000 tracking-tight font-display",
                 mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
               )}
               style={{ transitionDelay: "400ms" }}
@@ -250,7 +250,7 @@ export default function HomePage() {
 
             <p
               className={cn(
-                "text-lg md:text-xl text-stone-400 max-w-2xl mx-auto mb-12 transition-all duration-1000 leading-relaxed",
+                "text-sm sm:text-lg md:text-xl text-stone-400 max-w-2xl mx-auto mb-8 sm:mb-12 transition-all duration-1000 leading-relaxed",
                 mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
               )}
               style={{ transitionDelay: "600ms" }}
@@ -262,7 +262,7 @@ export default function HomePage() {
             {/* Platform icons */}
             <div
               className={cn(
-                "flex items-center justify-center gap-4 mb-12 transition-all duration-1000",
+                "flex items-center justify-center gap-2.5 sm:gap-4 mb-8 sm:mb-12 flex-wrap transition-all duration-1000",
                 mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
               )}
               style={{ transitionDelay: "700ms" }}
@@ -298,7 +298,7 @@ export default function HomePage() {
             <button
               onClick={handleEnter}
               className={cn(
-                "group relative inline-flex items-center gap-3 px-12 py-5 rounded-full text-lg font-semibold transition-all duration-1000 hover:scale-105",
+                "group relative inline-flex items-center gap-2.5 sm:gap-3 px-8 sm:px-12 py-4 sm:py-5 rounded-full text-base sm:text-lg font-semibold transition-all duration-1000 hover:scale-105 active:scale-95",
                 mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
               )}
               style={{ transitionDelay: "800ms" }}
@@ -335,7 +335,7 @@ export default function HomePage() {
           </div>
 
           {/* Features grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto w-full">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 max-w-6xl mx-auto w-full">
             {features.map((feature, index) => (
               <FeatureCard
                 key={feature.title}
@@ -347,7 +347,7 @@ export default function HomePage() {
         </main>
 
         {/* Footer */}
-        <footer className="p-8 text-center">
+        <footer className="p-4 sm:p-8 text-center">
           <p
             className={cn(
               "text-sm text-stone-600 transition-all duration-1000",
