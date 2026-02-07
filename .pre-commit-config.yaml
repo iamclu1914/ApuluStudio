@@ -1,0 +1,130 @@
+# Apulu Suite Pre-commit Configuration
+# Quality Team Local Quality Gates
+#
+# Installation:
+#   pip install pre-commit
+#   pre-commit install
+#
+# Manual run:
+#   pre-commit run --all-files
+
+default_language_version:
+  python: python3.11
+  node: '20.10.0'
+
+repos:
+  # ===========================================
+  # General Checks
+  # ===========================================
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: ^(frontend/node_modules/|backend/venv/)
+      - id: end-of-file-fixer
+        exclude: ^(frontend/node_modules/|backend/venv/)
+      - id: check-yaml
+        args: ['--unsafe']
+      - id: check-json
+        exclude: ^(frontend/node_modules/|package-lock\.json)
+      - id: check-added-large-files
+        args: ['--maxkb=1000']
+      - id: check-merge-conflict
+      - id: detect-private-key
+      - id: check-case-conflict
+
+  # ===========================================
+  # Secret Detection
+  # ===========================================
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.4.0
+    hooks:
+      - id: detect-secrets
+        args: ['--baseline', '.secrets.baseline']
+        exclude: ^(frontend/node_modules/|backend/venv/|\.lock$|package-lock\.json)
+
+  # ===========================================
+  # Python (Backend) Checks
+  # ===========================================
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.2.1
+    hooks:
+      # Linter
+      - id: ruff
+        args: [--fix, --exit-non-zero-on-fix]
+        files: ^backend/
+      # Formatter
+      - id: ruff-format
+        files: ^backend/
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.8.0
+    hooks:
+      - id: mypy
+        files: ^backend/app/
+        args: ['--ignore-missing-imports', '--no-error-summary']
+        additional_dependencies:
+          - pydantic>=2.0
+          - fastapi>=0.109.0
+          - sqlalchemy>=2.0
+        pass_filenames: false
+        entry: mypy backend/app
+
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.7
+    hooks:
+      - id: bandit
+        args: ['-r', '-ll', '-ii']
+        files: ^backend/app/
+        exclude: ^backend/app/tests/
+
+  # ===========================================
+  # JavaScript/TypeScript (Frontend) Checks
+  # ===========================================
+  - repo: local
+    hooks:
+      - id: eslint
+        name: ESLint
+        entry: bash -c 'cd frontend && npm run lint'
+        language: system
+        files: ^frontend/src/.*\.(js|jsx|ts|tsx)$
+        pass_filenames: false
+
+      - id: typescript-check
+        name: TypeScript Type Check
+        entry: bash -c 'cd frontend && npx tsc --noEmit'
+        language: system
+        files: ^frontend/src/.*\.(ts|tsx)$
+        pass_filenames: false
+
+  # ===========================================
+  # Documentation Checks
+  # ===========================================
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.39.0
+    hooks:
+      - id: markdownlint
+        args: ['--fix', '--disable', 'MD013', 'MD033', 'MD041']
+        exclude: ^(frontend/node_modules/|backend/venv/|CHANGELOG\.md)
+
+  # ===========================================
+  # Commit Message Standards
+  # ===========================================
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: v3.14.1
+    hooks:
+      - id: commitizen
+        stages: [commit-msg]
+
+# CI skip configuration
+ci:
+  autofix_commit_msg: |
+    [pre-commit.ci] auto fixes from hooks
+
+    for more information, see https://pre-commit.ci
+  autofix_prs: true
+  autoupdate_branch: 'develop'
+  autoupdate_commit_msg: '[pre-commit.ci] pre-commit autoupdate'
+  autoupdate_schedule: weekly
+  skip: [eslint, typescript-check]  # Skip in CI (handled by separate workflow)
+  submodules: false

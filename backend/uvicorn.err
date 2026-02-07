@@ -1,0 +1,5 @@
+INFO:     Started server process [32740]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+{"timestamp": "2026-02-01T22:45:15.516209Z", "level": "error", "logger": "apulu", "message": "Error in LATE sync scheduler", "exc_info": true, "error": {"type": "str", "message": "Network error contacting LATE API: All connection attempts failed"}}
