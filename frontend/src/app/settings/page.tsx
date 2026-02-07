@@ -135,15 +135,15 @@ export default function SettingsPage() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-8 max-w-4xl">
+      <div className="space-y-6 sm:space-y-8 max-w-4xl">
         {/* Header */}
-        <div className="flex items-center gap-4">
-          <div className="p-3 rounded-2xl gradient-primary shadow-lg shadow-amber-500/25">
-            <Settings className="w-6 h-6 text-white" />
+        <div className="flex items-center gap-3 sm:gap-4">
+          <div className="p-2.5 sm:p-3 rounded-xl sm:rounded-2xl gradient-primary shadow-lg shadow-amber-500/25">
+            <Settings className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
-            <p className="text-gray-500 mt-1">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 font-display">Settings</h1>
+            <p className="text-gray-500 mt-0.5 sm:mt-1 text-sm">
               Manage your connected accounts and preferences
             </p>
           </div>
@@ -152,7 +152,7 @@ export default function SettingsPage() {
         {/* Connected Accounts */}
         <Card>
           <CardHeader className="border-b border-gray-100">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-xl bg-gradient-to-br from-amber-500 to-yellow-500">
                   <LinkIcon className="w-4 h-4 text-white" />
@@ -167,6 +167,7 @@ export default function SettingsPage() {
                 size="sm"
                 onClick={() => syncLateAccounts.mutate()}
                 loading={syncLateAccounts.isPending}
+                className="self-start sm:self-auto"
               >
                 <RefreshCw className="w-4 h-4" />
                 Sync from LATE
@@ -188,9 +189,9 @@ export default function SettingsPage() {
                   const account = status?.account;
 
                   return (
-                    <li key={platform.key} className="p-5 hover:bg-gray-50/50 transition-colors">
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-start gap-4">
+                    <li key={platform.key} className="p-4 sm:p-5 hover:bg-gray-50/50 transition-colors">
+                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                        <div className="flex items-start gap-3 sm:gap-4">
                           <PlatformBadge
                             platform={platform.key}
                             size="lg"
@@ -199,19 +200,19 @@ export default function SettingsPage() {
                             <h3 className="font-semibold text-gray-900">
                               {platform.name}
                             </h3>
-                            <p className="text-sm text-gray-500 mt-0.5 max-w-md">
+                            <p className="text-xs sm:text-sm text-gray-500 mt-0.5">
                               {platform.description}
                             </p>
 
                             {account && (
-                              <div className="mt-3 flex items-center gap-4">
-                                <span className="inline-flex items-center px-3 py-1 rounded-full bg-gray-100 text-sm font-medium text-gray-700">
+                              <div className="mt-2 sm:mt-3 flex flex-wrap items-center gap-2 sm:gap-4">
+                                <span className="inline-flex items-center px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-gray-100 text-xs sm:text-sm font-medium text-gray-700">
                                   @{account.username}
                                 </span>
-                                <span className="text-sm text-gray-500">
+                                <span className="text-xs sm:text-sm text-gray-500">
                                   {formatNumber(account.follower_count)} followers
                                 </span>
-                                <span className="text-xs text-gray-400">
+                                <span className="text-xs text-gray-400 hidden sm:inline">
                                   Synced: {account.last_synced ? formatDate(account.last_synced) : "Never"}
                                 </span>
                               </div>
@@ -387,21 +388,21 @@ export default function SettingsPage() {
           </CardHeader>
           <CardContent className="py-6">
             <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 rounded-xl bg-gray-50">
+              <div className="flex flex-wrap items-center justify-between gap-2 p-3 sm:p-4 rounded-xl bg-gray-50">
                 <div>
-                  <p className="font-medium text-gray-900">Data Encryption</p>
-                  <p className="text-sm text-gray-500">All credentials are encrypted at rest</p>
+                  <p className="font-medium text-gray-900 text-sm sm:text-base">Data Encryption</p>
+                  <p className="text-xs sm:text-sm text-gray-500">All credentials are encrypted at rest</p>
                 </div>
-                <span className="px-3 py-1 rounded-full bg-green-100 text-green-700 text-sm font-medium">
+                <span className="px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs sm:text-sm font-medium">
                   Enabled
                 </span>
               </div>
-              <div className="flex items-center justify-between p-4 rounded-xl bg-gray-50">
+              <div className="flex flex-wrap items-center justify-between gap-2 p-3 sm:p-4 rounded-xl bg-gray-50">
                 <div>
-                  <p className="font-medium text-gray-900">OAuth Tokens</p>
-                  <p className="text-sm text-gray-500">Securely stored in Supabase</p>
+                  <p className="font-medium text-gray-900 text-sm sm:text-base">OAuth Tokens</p>
+                  <p className="text-xs sm:text-sm text-gray-500">Securely stored in Supabase</p>
                 </div>
-                <span className="px-3 py-1 rounded-full bg-green-100 text-green-700 text-sm font-medium">
+                <span className="px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs sm:text-sm font-medium">
                   Secure
                 </span>
               </div>
@@ -423,9 +424,9 @@ export default function SettingsPage() {
             </div>
           </CardHeader>
           <CardContent className="py-6">
-            <div className="flex items-center gap-6">
-              <div className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center shadow-lg shadow-amber-500/25">
-                <Sparkles className="w-8 h-8 text-white" />
+            <div className="flex items-center gap-4 sm:gap-6">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl gradient-primary flex items-center justify-center shadow-lg shadow-amber-500/25 flex-shrink-0">
+                <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
               </div>
               <div>
                 <h3 className="text-xl font-bold text-gray-900">Apulu Studio</h3>

@@ -35,22 +35,22 @@ export default function AccountPage() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-8 max-w-4xl">
+      <div className="space-y-6 sm:space-y-8 max-w-4xl">
         {/* Header */}
-        <div className="flex items-center gap-4">
-          <div className="p-3 rounded-2xl gradient-primary shadow-lg shadow-amber-500/25">
-            <User className="w-6 h-6 text-white" />
+        <div className="flex items-center gap-3 sm:gap-4">
+          <div className="p-2.5 sm:p-3 rounded-xl sm:rounded-2xl gradient-primary shadow-lg shadow-amber-500/25">
+            <User className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Account</h1>
-            <p className="text-gray-500 mt-1">Manage your profile and preferences</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 font-display">Account</h1>
+            <p className="text-gray-500 mt-0.5 sm:mt-1 text-sm">Manage your profile and preferences</p>
           </div>
         </div>
 
         {/* Profile Card */}
         <Card>
           <CardHeader className="border-b border-gray-100">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-xl bg-gradient-to-br from-violet-500 to-purple-500">
                   <User className="w-4 h-4 text-white" />
@@ -64,6 +64,7 @@ export default function AccountPage() {
                 variant="outline"
                 size="sm"
                 onClick={() => setIsEditing(!isEditing)}
+                className="self-start sm:self-auto"
               >
                 <Edit2 className="w-4 h-4" />
                 {isEditing ? "Cancel" : "Edit"}
@@ -71,10 +72,10 @@ export default function AccountPage() {
             </div>
           </CardHeader>
           <CardContent className="py-6">
-            <div className="flex items-start gap-8">
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 sm:gap-8">
               {/* Avatar */}
-              <div className="relative">
-                <div className="w-24 h-24 rounded-2xl gradient-gold flex items-center justify-center text-white text-3xl font-bold shadow-lg">
+              <div className="relative flex-shrink-0">
+                <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl gradient-gold flex items-center justify-center text-white text-2xl sm:text-3xl font-bold shadow-lg">
                   V
                 </div>
                 {isEditing && (
@@ -85,8 +86,8 @@ export default function AccountPage() {
               </div>
 
               {/* Form */}
-              <div className="flex-1 space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+              <div className="flex-1 w-full space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1.5">
                       Display Name
@@ -151,13 +152,13 @@ export default function AccountPage() {
             </div>
           </CardHeader>
           <CardContent className="py-6">
-            <div className="flex items-center justify-between">
-              <p className="text-gray-600">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <p className="text-gray-600 text-sm sm:text-base">
                 Manage your social media connections in Settings
               </p>
               <a
                 href="/settings"
-                className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium rounded-xl border-2 border-gray-200 bg-white hover:bg-gray-50 text-gray-700 transition-colors"
+                className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium rounded-xl border-2 border-gray-200 bg-white hover:bg-gray-50 text-gray-700 transition-colors self-start sm:self-auto flex-shrink-0"
               >
                 Manage Connections
               </a>
@@ -179,7 +180,7 @@ export default function AccountPage() {
             </div>
           </CardHeader>
           <CardContent className="py-6">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div>
                 <p className="text-2xl font-bold text-gray-900">$19/month</p>
                 <p className="text-sm text-gray-500 mt-1">
@@ -222,14 +223,14 @@ export default function AccountPage() {
             </div>
           </CardHeader>
           <CardContent className="py-6">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div>
                 <p className="font-medium text-gray-900">Sign Out</p>
                 <p className="text-sm text-gray-500">
                   Sign out of your account on this device
                 </p>
               </div>
-              <Button variant="outline" className="text-red-600 border-red-200 hover:bg-red-50">
+              <Button variant="outline" className="text-red-600 border-red-200 hover:bg-red-50 self-start sm:self-auto">
                 <LogOut className="w-4 h-4" />
                 Sign Out
               </Button>

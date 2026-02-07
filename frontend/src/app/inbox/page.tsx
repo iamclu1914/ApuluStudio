@@ -65,22 +65,22 @@ export default function InboxPage() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-8">
+      <div className="space-y-6 sm:space-y-8">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="p-3 rounded-2xl gradient-gold shadow-lg shadow-amber-500/25">
-              <InboxIcon className="w-6 h-6 text-white" />
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+          <div className="flex items-center gap-3 sm:gap-4">
+            <div className="p-2.5 sm:p-3 rounded-xl sm:rounded-2xl gradient-gold shadow-lg shadow-amber-500/25">
+              <InboxIcon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Inbox</h1>
-              <p className="text-gray-500 mt-1">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 font-display">Inbox</h1>
+              <p className="text-gray-500 mt-0.5 sm:mt-1 text-sm">
                 {data?.unread_count || 0} unread notification
                 {data?.unread_count !== 1 ? "s" : ""}
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <Button
               variant="outline"
               size="sm"
@@ -97,21 +97,22 @@ export default function InboxPage() {
               disabled={data?.unread_count === 0}
             >
               <CheckCheck className="w-4 h-4" />
-              Mark All Read
+              <span className="hidden sm:inline">Mark All Read</span>
+              <span className="sm:hidden">Read All</span>
             </Button>
           </div>
         </div>
 
         {/* Filters */}
         <div className="flex items-center gap-4 flex-wrap">
-          <div className="flex items-center gap-1 bg-gray-100 rounded-xl p-1.5">
+          <div className="flex items-center gap-1 bg-gray-100 rounded-xl p-1 sm:p-1.5">
             {(["all", "unread", "comment", "mention"] as FilterType[]).map(
               (f) => (
                 <button
                   key={f}
                   onClick={() => setFilter(f)}
                   className={cn(
-                    "px-4 py-2 text-sm font-medium rounded-lg transition-all capitalize",
+                    "px-2.5 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium rounded-lg transition-all capitalize",
                     filter === f
                       ? "bg-white text-gray-900 shadow-md"
                       : "text-gray-600 hover:text-gray-900 hover:bg-white/50"
@@ -202,14 +203,14 @@ function InboxListItem({ item }: { item: InboxItem }) {
   return (
     <li
       className={cn(
-        "p-5 hover:bg-gray-50/50 transition-colors cursor-pointer",
+        "p-3.5 sm:p-5 hover:bg-gray-50/50 transition-colors cursor-pointer",
         !item.is_read && "bg-amber-50/30"
       )}
       onClick={() => !item.is_read && markReadMutation.mutate()}
     >
-      <div className="flex items-start gap-4">
+      <div className="flex items-start gap-3 sm:gap-4">
         {/* Avatar */}
-        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex-shrink-0 flex items-center justify-center overflow-hidden shadow-inner">
+        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex-shrink-0 flex items-center justify-center overflow-hidden shadow-inner">
           {item.author_avatar_url ? (
             <img
               src={item.author_avatar_url}

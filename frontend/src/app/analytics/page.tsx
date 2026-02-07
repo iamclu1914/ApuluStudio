@@ -58,7 +58,7 @@ export default function AnalyticsPage() {
         {/* Growth Chart */}
         <Card>
           <CardHeader className="border-b border-gray-100">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-500">
                   <TrendingUp className="w-4 h-4 text-white" />
@@ -161,63 +161,65 @@ export default function AnalyticsPage() {
             ) : (
               <ul className="divide-y divide-gray-100">
                 {topPosts.map((post: TopPost, index: number) => (
-                  <li key={post.id} className="p-5 flex items-center gap-4 hover:bg-gray-50/50 transition-colors">
-                    <div
-                      className={cn(
-                        "w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shadow-lg",
-                        index === 0
-                          ? "bg-gradient-to-br from-yellow-400 to-orange-500 text-white"
-                          : index === 1
-                          ? "bg-gradient-to-br from-gray-300 to-gray-400 text-white"
-                          : index === 2
-                          ? "bg-gradient-to-br from-orange-300 to-orange-400 text-white"
-                          : "bg-gray-100 text-gray-500"
-                      )}
-                    >
-                      {index + 1}
-                    </div>
+                  <li key={post.id} className="p-3.5 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 hover:bg-gray-50/50 transition-colors">
+                    <div className="flex items-center gap-3 sm:gap-4">
+                      <div
+                        className={cn(
+                          "w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-bold text-xs sm:text-sm shadow-lg flex-shrink-0",
+                          index === 0
+                            ? "bg-gradient-to-br from-yellow-400 to-orange-500 text-white"
+                            : index === 1
+                            ? "bg-gradient-to-br from-gray-300 to-gray-400 text-white"
+                            : index === 2
+                            ? "bg-gradient-to-br from-orange-300 to-orange-400 text-white"
+                            : "bg-gray-100 text-gray-500"
+                        )}
+                      >
+                        {index + 1}
+                      </div>
 
-                    <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-gray-100 to-gray-200 flex-shrink-0 overflow-hidden shadow-inner">
-                      {post.thumbnail_url ? (
-                        <img
-                          src={post.thumbnail_url}
-                          alt=""
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-2xl">
-                          📝
+                      <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-xl bg-gradient-to-br from-gray-100 to-gray-200 flex-shrink-0 overflow-hidden shadow-inner">
+                        {post.thumbnail_url ? (
+                          <img
+                            src={post.thumbnail_url}
+                            alt=""
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-lg sm:text-2xl">
+                            📝
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm text-gray-900 font-medium line-clamp-1">
+                          {post.content}
+                        </p>
+                        <div className="flex items-center gap-2 mt-1.5">
+                          <PlatformBadge platform={post.platform} size="sm" />
+                          <span className="text-xs text-gray-500">
+                            {formatDate(post.published_at)}
+                          </span>
                         </div>
-                      )}
-                    </div>
-
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm text-gray-900 font-medium line-clamp-1">
-                        {post.content}
-                      </p>
-                      <div className="flex items-center gap-2 mt-1.5">
-                        <PlatformBadge platform={post.platform} size="sm" />
-                        <span className="text-xs text-gray-500">
-                          {formatDate(post.published_at)}
-                        </span>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-6 text-sm">
+                    <div className="flex items-center gap-4 sm:gap-6 text-sm ml-11 sm:ml-0">
                       <div className="text-center">
-                        <p className="font-bold text-gray-900 text-lg">
+                        <p className="font-bold text-gray-900 text-base sm:text-lg">
                           {formatNumber(post.likes_count)}
                         </p>
                         <p className="text-xs text-gray-500 font-medium">Likes</p>
                       </div>
                       <div className="text-center">
-                        <p className="font-bold text-gray-900 text-lg">
+                        <p className="font-bold text-gray-900 text-base sm:text-lg">
                           {formatNumber(post.comments_count)}
                         </p>
                         <p className="text-xs text-gray-500 font-medium">Comments</p>
                       </div>
                       <div className="text-center">
-                        <p className="font-bold text-gray-900 text-lg">
+                        <p className="font-bold text-gray-900 text-base sm:text-lg">
                           {formatNumber(post.shares_count)}
                         </p>
                         <p className="text-xs text-gray-500 font-medium">Shares</p>

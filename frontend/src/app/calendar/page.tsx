@@ -68,15 +68,15 @@ export default function CalendarPage() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-8">
+      <div className="space-y-6 sm:space-y-8">
         {/* Header */}
-        <div className="flex items-center gap-4">
-          <div className="p-3 rounded-2xl gradient-primary shadow-lg shadow-amber-500/25">
-            <CalendarIcon className="w-6 h-6 text-white" />
+        <div className="flex items-center gap-3 sm:gap-4">
+          <div className="p-2.5 sm:p-3 rounded-xl sm:rounded-2xl gradient-primary shadow-lg shadow-amber-500/25">
+            <CalendarIcon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Content Calendar</h1>
-            <p className="text-gray-500 mt-1">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 font-display">Content Calendar</h1>
+            <p className="text-gray-500 mt-0.5 sm:mt-1 text-sm">
               Schedule and manage your posts
             </p>
           </div>
@@ -84,8 +84,8 @@ export default function CalendarPage() {
 
         <Card>
           <CardHeader className="border-b border-gray-100">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div className="flex items-center gap-2 sm:gap-3">
                 <Button
                   variant="ghost"
                   size="sm"
@@ -94,7 +94,7 @@ export default function CalendarPage() {
                 >
                   <ChevronLeft className="w-5 h-5" />
                 </Button>
-                <span className="text-xl font-bold text-gray-900 min-w-[180px] text-center">
+                <span className="text-base sm:text-xl font-bold text-gray-900 min-w-0 sm:min-w-[180px] text-center">
                   {format(currentDate, "MMMM yyyy")}
                 </span>
                 <Button
@@ -106,7 +106,7 @@ export default function CalendarPage() {
                   <ChevronRight className="w-5 h-5" />
                 </Button>
               </div>
-              <Button size="lg" onClick={handleNewPost}>
+              <Button size="lg" onClick={handleNewPost} className="self-start sm:self-auto">
                 <Plus className="w-4 h-4" />
                 New Post
               </Button>
@@ -115,12 +115,13 @@ export default function CalendarPage() {
           <CardContent className="p-0">
             {/* Day headers */}
             <div className="grid grid-cols-7 border-b border-gray-100 bg-gray-50/50">
-              {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
+              {["S", "M", "T", "W", "T", "F", "S"].map((day, i) => (
                 <div
-                  key={day}
-                  className="py-3 text-center text-sm font-semibold text-gray-600"
+                  key={i}
+                  className="py-2 sm:py-3 text-center text-xs sm:text-sm font-semibold text-gray-600"
                 >
-                  {day}
+                  <span className="sm:hidden">{day}</span>
+                  <span className="hidden sm:inline">{["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][i]}</span>
                 </div>
               ))}
             </div>
@@ -138,7 +139,7 @@ export default function CalendarPage() {
                   <div
                     key={day.toISOString()}
                     className={cn(
-                      "min-h-[120px] p-3 border-b border-r border-gray-100 transition-colors hover:bg-gray-50/50",
+                      "min-h-[60px] sm:min-h-[120px] p-1.5 sm:p-3 border-b border-r border-gray-100 transition-colors hover:bg-gray-50/50",
                       !isCurrentMonth && "bg-gray-50/30",
                       isFirstRow && "border-t-0",
                       isFirstCol && "border-l-0"
@@ -146,7 +147,7 @@ export default function CalendarPage() {
                   >
                     <div
                       className={cn(
-                        "w-8 h-8 flex items-center justify-center text-sm rounded-full mb-2 font-medium transition-all",
+                        "w-6 h-6 sm:w-8 sm:h-8 flex items-center justify-center text-xs sm:text-sm rounded-full mb-1 sm:mb-2 font-medium transition-all",
                         isToday
                           ? "gradient-primary text-white font-bold shadow-lg shadow-amber-500/25"
                           : isCurrentMonth

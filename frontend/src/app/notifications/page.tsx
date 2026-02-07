@@ -85,16 +85,16 @@ export default function NotificationsPage() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-8 max-w-4xl">
+      <div className="space-y-6 sm:space-y-8 max-w-4xl">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="p-3 rounded-2xl gradient-primary shadow-lg shadow-amber-500/25">
-              <Bell className="w-6 h-6 text-white" />
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div className="flex items-center gap-3 sm:gap-4">
+            <div className="p-2.5 sm:p-3 rounded-xl sm:rounded-2xl gradient-primary shadow-lg shadow-amber-500/25">
+              <Bell className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Notifications</h1>
-              <p className="text-gray-500 mt-1">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 font-display">Notifications</h1>
+              <p className="text-gray-500 mt-0.5 sm:mt-1 text-sm">
                 {unreadCount > 0
                   ? `${unreadCount} unread notification${unreadCount > 1 ? "s" : ""}`
                   : "You're all caught up!"}

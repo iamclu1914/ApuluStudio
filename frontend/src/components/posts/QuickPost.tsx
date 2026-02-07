@@ -599,8 +599,8 @@ export function QuickPost() {
             </div>
 
             {/* Actions */}
-            <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-              <div className="flex items-center gap-2">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 pt-3 border-t border-gray-100">
+              <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
                 <Button
                   variant="ghost"
                   size="sm"
@@ -608,7 +608,7 @@ export function QuickPost() {
                   className="text-amber-600 hover:text-amber-700 hover:bg-amber-50"
                 >
                   <Sparkles className="w-4 h-4" />
-                  AI Write
+                  <span className="hidden sm:inline">AI Write</span>
                 </Button>
                 <div className="relative" ref={emojiPickerRef}>
                   <Button
@@ -621,7 +621,7 @@ export function QuickPost() {
                     )}
                   >
                     <Smile className="w-4 h-4" />
-                    Emoji
+                    <span className="hidden sm:inline">Emoji</span>
                   </Button>
                   {showEmojiPicker && (
                     <div className="absolute bottom-full left-0 mb-2 z-50">
@@ -650,7 +650,7 @@ export function QuickPost() {
                   ) : (
                     <Image className="w-4 h-4" />
                   )}
-                  {mediaUrls.length > 0 ? "Media Added" : "Media"}
+                  <span className="hidden sm:inline">{mediaUrls.length > 0 ? "Media Added" : "Media"}</span>
                 </Button>
                 <Button
                   variant="ghost"
@@ -662,7 +662,7 @@ export function QuickPost() {
                   )}
                 >
                   <Calendar className="w-4 h-4" />
-                  Schedule
+                  <span className="hidden sm:inline">Schedule</span>
                 </Button>
               </div>
               {!showSchedule && (

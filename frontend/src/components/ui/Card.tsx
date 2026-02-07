@@ -77,7 +77,7 @@ export function CardHeader({
   return (
     <div
       className={cn(
-        "px-6 py-5",
+        "px-4 py-4 sm:px-6 sm:py-5",
         "border-b border-gray-100/60",
         className
       )}
@@ -124,7 +124,7 @@ export function CardContent({
 }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn("px-6 py-5", className)}
+      className={cn("px-4 py-4 sm:px-6 sm:py-5", className)}
       {...props}
     />
   );
