@@ -2,6 +2,7 @@
 
 from datetime import datetime, timezone
 from typing import Annotated
+import logging
 import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -27,6 +28,7 @@ from app.schemas.auth import (
 )
 from app.api.deps import CurrentActiveUser
 
+logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
@@ -41,38 +43,48 @@ async def register(
     Returns JWT tokens upon successful registration.
     """
     # Check if email already exists
-    result = await db.execute(
-        select(User).where(User.email == data.email)
-    )
-    existing_user = result.scalar_one_or_none()
-
-    if existing_user:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Email already registered",
+    try:
+        result = await db.execute(
+            select(User).where(User.email == data.email)
         )
+        existing_user = result.scalar_one_or_none()
 
-    # Create new user
-    user = User(
-        id=str(uuid.uuid4()),
-        email=data.email,
-        hashed_password=get_password_hash(data.password),
-        name=data.name,
-        is_active=True,
-        max_social_accounts=5,  # Default limit
-    )
-    db.add(user)
-    await db.commit()
-    await db.refresh(user)
+        if existing_user:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Email already registered",
+            )
 
-    # Generate tokens
-    access_token = create_access_token(subject=user.id)
-    refresh_token = create_refresh_token(subject=user.id)
+        # Create new user
+        user = User(
+            id=str(uuid.uuid4()),
+            email=data.email,
+            hashed_password=get_password_hash(data.password),
+            name=data.name,
+            is_active=True,
+            max_social_accounts=5,  # Default limit
+        )
+        db.add(user)
+        await db.commit()
+        await db.refresh(user)
 
-    return TokenResponse(
-        access_token=access_token,
-        refresh_token=refresh_token,
-    )
+        # Generate tokens
+        access_token = create_access_token(subject=user.id)
+        refresh_token = create_refresh_token(subject=user.id)
+
+        return TokenResponse(
+            access_token=access_token,
+            refresh_token=refresh_token,
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Registration failed: {type(e).__name__}: {e}")
+        await db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Registration failed: {type(e).__name__}: {str(e)}",
+        )
 
 
 @router.post("/login", response_model=TokenResponse)
