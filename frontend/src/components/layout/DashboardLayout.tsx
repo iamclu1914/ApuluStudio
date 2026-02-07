@@ -22,6 +22,8 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { accountsApi } from "@/lib/api";
+import { AuthGuard } from "@/components/auth/AuthGuard";
+import { logout } from "@/store/auth";
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -67,6 +69,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   }, [queryClient]);
 
   return (
+    <AuthGuard>
     <div className="min-h-screen">
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
@@ -194,6 +197,19 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
               <span className="text-amber-400">7 days left</span>
             </p>
           </div>
+
+          {/* Logout button */}
+          <div className="px-4 mb-4">
+            <button
+              onClick={logout}
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium text-gray-400 hover:bg-white/[0.04] hover:text-gray-200 transition-all duration-300"
+            >
+              <div className="p-2.5 rounded-xl bg-white/[0.05]">
+                <X className="w-4 h-4" />
+              </div>
+              <span>Sign Out</span>
+            </button>
+          </div>
         </div>
       </aside>
 
@@ -262,5 +278,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         </main>
       </div>
     </div>
+    </AuthGuard>
   );
 }

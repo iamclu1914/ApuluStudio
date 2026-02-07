@@ -14,6 +14,7 @@ import {
   LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { getAccessToken } from "@/store/auth";
 
 // Floating particle component
 function Particle({ delay, duration, size, left, top }: {
@@ -103,8 +104,9 @@ export default function HomePage() {
 
   const handleEnter = () => {
     setEntering(true);
+    const target = getAccessToken() ? "/dashboard" : "/login";
     setTimeout(() => {
-      router.push("/dashboard");
+      router.push(target);
     }, 800);
   };
 

@@ -39,6 +39,85 @@ export const api = axios.create({
   },
 });
 
+// --- Axios interceptors for JWT auth ---
+
+// Attach access token to every request
+api.interceptors.request.use((config) => {
+  if (typeof window !== "undefined") {
+    const token = localStorage.getItem("apulu_access_token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+  }
+  return config;
+});
+
+// On 401, try refreshing the token once
+let isRefreshing = false;
+let refreshSubscribers: ((token: string) => void)[] = [];
+
+function onTokenRefreshed(token: string) {
+  refreshSubscribers.forEach((cb) => cb(token));
+  refreshSubscribers = [];
+}
+
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+
+    // Skip refresh logic for auth endpoints themselves
+    if (
+      !error.response ||
+      error.response.status !== 401 ||
+      originalRequest._retry ||
+      originalRequest.url?.includes("/auth/login") ||
+      originalRequest.url?.includes("/auth/register") ||
+      originalRequest.url?.includes("/auth/refresh")
+    ) {
+      return Promise.reject(error);
+    }
+
+    if (isRefreshing) {
+      // Queue this request until the refresh completes
+      return new Promise((resolve) => {
+        refreshSubscribers.push((token: string) => {
+          originalRequest.headers.Authorization = `Bearer ${token}`;
+          resolve(api(originalRequest));
+        });
+      });
+    }
+
+    originalRequest._retry = true;
+    isRefreshing = true;
+
+    try {
+      const refreshToken = localStorage.getItem("apulu_refresh_token");
+      if (!refreshToken) throw new Error("No refresh token");
+
+      const { data } = await api.post("/auth/refresh", {
+        refresh_token: refreshToken,
+      });
+
+      localStorage.setItem("apulu_access_token", data.access_token);
+      localStorage.setItem("apulu_refresh_token", data.refresh_token);
+
+      onTokenRefreshed(data.access_token);
+      originalRequest.headers.Authorization = `Bearer ${data.access_token}`;
+      return api(originalRequest);
+    } catch {
+      localStorage.removeItem("apulu_access_token");
+      localStorage.removeItem("apulu_refresh_token");
+      if (typeof window !== "undefined" && !window.location.pathname.startsWith("/login")) {
+        window.location.href = "/login";
+      }
+      return Promise.reject(error);
+    } finally {
+      isRefreshing = false;
+    }
+  }
+);
+
 // Types
 export interface Platform {
   platform: string;
