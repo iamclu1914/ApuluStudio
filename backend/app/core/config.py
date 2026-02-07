@@ -72,7 +72,15 @@ class Settings(BaseSettings):
     # Render and Supabase may provide postgres:// or postgresql://
     # but SQLAlchemy async needs postgresql+asyncpg://
     @model_validator(mode="after")
-    def fix_database_url(self) -> "Settings":
+    def fix_urls(self) -> "Settings":
+        # Strip trailing slashes from URLs so CORS origin matching works
+        # (browsers send Origin without trailing slash)
+        self.frontend_url = self.frontend_url.rstrip("/")
+        self.backend_url = self.backend_url.rstrip("/")
+
+        # Auto-convert DATABASE_URL schemes for compatibility
+        # Render and Supabase may provide postgres:// or postgresql://
+        # but SQLAlchemy async needs postgresql+asyncpg://
         url = self.database_url
         if url.startswith("postgres://"):
             self.database_url = url.replace("postgres://", "postgresql+asyncpg://", 1)

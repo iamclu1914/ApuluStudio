@@ -120,10 +120,11 @@ app.add_middleware(
 )
 
 # CORS middleware - added LAST to be outermost (handles all responses including errors)
+# NOTE: Origins must NOT have trailing slashes (browsers send Origin without one)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        settings.frontend_url,
+        settings.frontend_url,  # from FRONTEND_URL env var (trailing slash stripped in config)
         "https://studio-lime-mu-69.vercel.app",
         "http://localhost:3000",
         "http://127.0.0.1:3000",
