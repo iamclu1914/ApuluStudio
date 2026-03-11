@@ -106,6 +106,23 @@ export interface PlatformStats {
   engagement_rate: number;
 }
 
+export interface GrowthDataPoint {
+  date: string;
+  followers: number;
+  engagement: number;
+}
+
+export interface TopPost {
+  id: string;
+  content: string;
+  platform: string;
+  thumbnail_url: string | null;
+  published_at: string;
+  likes_count: number;
+  comments_count: number;
+  shares_count: number;
+}
+
 export interface CaptionVariation {
   tone: string;
   caption: string;
