@@ -106,6 +106,21 @@ export interface PlatformStats {
   engagement_rate: number;
 }
 
+export interface ScheduleTimeSlot {
+  datetime: string;
+  score: number;
+  reason: string;
+}
+
+export interface PlatformScheduleSuggestion {
+  best_time: ScheduleTimeSlot;
+  alternative_times: ScheduleTimeSlot[];
+}
+
+export interface ScheduleSuggestionsResponse {
+  suggestions: Record<string, PlatformScheduleSuggestion>;
+}
+
 export interface GrowthDataPoint {
   date: string;
   followers: number;
@@ -169,7 +184,7 @@ export const postsApi = {
     api.get(`/posts/smart-slots/${platform}`),
 
   getScheduleSuggestions: (platforms: string[]) =>
-    api.get(`/posts/schedule-suggestions`, { params: { platforms: platforms.join(",") } }),
+    api.get<ScheduleSuggestionsResponse>(`/posts/schedule-suggestions`, { params: { platforms: platforms.join(",") } }),
 
   upload: (file: File, platforms?: string[]) => {
     const formData = new FormData();
