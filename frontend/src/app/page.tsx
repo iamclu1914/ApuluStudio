@@ -1,17 +1,26 @@
 "use client";
 
-import { useRef, useState, useCallback } from "react";
+import { useRef, useState, useCallback, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { GrowthBanner } from "@/components/analytics/GrowthBanner";
 import { ComposeArea } from "@/components/posts/ComposeArea";
 import { UpcomingPostsV2 } from "@/components/posts/UpcomingPostsV2";
 import { RecentActivityV2 } from "@/components/inbox/RecentActivityV2";
 import { Post } from "@/lib/api";
+import { getAccessToken } from "@/store/auth";
 
 export default function Dashboard() {
+  const router = useRouter();
   const composeRef = useRef<HTMLDivElement>(null);
   const [composeHighlight, setComposeHighlight] = useState(false);
   const [editingPost, setEditingPost] = useState<Post | null>(null);
+
+  useEffect(() => {
+    if (!getAccessToken()) {
+      router.replace("/login");
+    }
+  }, [router]);
 
   const handleEditPost = useCallback((post: Post) => {
     setEditingPost(post);
