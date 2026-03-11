@@ -1,36 +1,6 @@
 import axios from "axios";
 
-const LOCAL_API_HOSTS = new Set(["localhost", "127.0.0.1"]);
-const DEFAULT_API_URL = "http://localhost:8000/api";
-
-function resolveApiUrl() {
-  const configuredUrl = process.env.NEXT_PUBLIC_API_URL;
-
-  if (typeof window === "undefined") {
-    return configuredUrl || DEFAULT_API_URL;
-  }
-
-  const browserHost = window.location.hostname;
-
-  if (!configuredUrl) {
-    return `http://${browserHost}:8000/api`;
-  }
-
-  try {
-    const parsed = new URL(configuredUrl);
-
-    if (LOCAL_API_HOSTS.has(parsed.hostname) && !LOCAL_API_HOSTS.has(browserHost)) {
-      parsed.hostname = browserHost;
-      return parsed.toString();
-    }
-  } catch {
-    // Keep configuredUrl as-is when it's not a fully qualified URL.
-  }
-
-  return configuredUrl;
-}
-
-const API_URL = resolveApiUrl();
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
 
 export const api = axios.create({
   baseURL: API_URL,
@@ -38,85 +8,6 @@ export const api = axios.create({
     "Content-Type": "application/json",
   },
 });
-
-// --- Axios interceptors for JWT auth ---
-
-// Attach access token to every request
-api.interceptors.request.use((config) => {
-  if (typeof window !== "undefined") {
-    const token = localStorage.getItem("apulu_access_token");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-  }
-  return config;
-});
-
-// On 401, try refreshing the token once
-let isRefreshing = false;
-let refreshSubscribers: ((token: string) => void)[] = [];
-
-function onTokenRefreshed(token: string) {
-  refreshSubscribers.forEach((cb) => cb(token));
-  refreshSubscribers = [];
-}
-
-api.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
-
-    // Skip refresh logic for auth endpoints themselves
-    if (
-      !error.response ||
-      error.response.status !== 401 ||
-      originalRequest._retry ||
-      originalRequest.url?.includes("/auth/login") ||
-      originalRequest.url?.includes("/auth/register") ||
-      originalRequest.url?.includes("/auth/refresh")
-    ) {
-      return Promise.reject(error);
-    }
-
-    if (isRefreshing) {
-      // Queue this request until the refresh completes
-      return new Promise((resolve) => {
-        refreshSubscribers.push((token: string) => {
-          originalRequest.headers.Authorization = `Bearer ${token}`;
-          resolve(api(originalRequest));
-        });
-      });
-    }
-
-    originalRequest._retry = true;
-    isRefreshing = true;
-
-    try {
-      const refreshToken = localStorage.getItem("apulu_refresh_token");
-      if (!refreshToken) throw new Error("No refresh token");
-
-      const { data } = await api.post("/auth/refresh", {
-        refresh_token: refreshToken,
-      });
-
-      localStorage.setItem("apulu_access_token", data.access_token);
-      localStorage.setItem("apulu_refresh_token", data.refresh_token);
-
-      onTokenRefreshed(data.access_token);
-      originalRequest.headers.Authorization = `Bearer ${data.access_token}`;
-      return api(originalRequest);
-    } catch {
-      localStorage.removeItem("apulu_access_token");
-      localStorage.removeItem("apulu_refresh_token");
-      if (typeof window !== "undefined" && !window.location.pathname.startsWith("/login")) {
-        window.location.href = "/login";
-      }
-      return Promise.reject(error);
-    } finally {
-      isRefreshing = false;
-    }
-  }
-);
 
 // Types
 export interface Platform {
@@ -184,11 +75,27 @@ export interface InboxItem {
 }
 
 export interface OverviewStats {
+  // Existing fields
   total_followers: number;
   total_engagement: number;
   posts_this_week: number;
   engagement_rate: number;
   platforms: PlatformStats[];
+  // New fields
+  reach?: number;
+  impressions?: number;
+  followers_change_pct?: number;
+  reach_change_pct?: number;
+  impressions_change_pct?: number;
+  engagement_change_pct?: number;
+  followers_sparkline?: number[];
+  reach_sparkline?: number[];
+  impressions_sparkline?: number[];
+  engagement_sparkline?: number[];
+  platform_breakdown?: {
+    platform: string;
+    followers: number;
+  }[];
 }
 
 export interface PlatformStats {
@@ -197,42 +104,6 @@ export interface PlatformStats {
   following: number;
   posts_count: number;
   engagement_rate: number;
-}
-
-export interface GrowthDataPoint {
-  date: string;
-  followers: number;
-  engagement: number;
-}
-
-export interface GrowthData {
-  data_points: GrowthDataPoint[];
-  percent_change: number;
-}
-
-export interface TopPost {
-  id: string;
-  content: string;
-  platform: string;
-  thumbnail_url: string | null;
-  published_at: string;
-  likes_count: number;
-  comments_count: number;
-  shares_count: number;
-}
-
-export interface ScheduleTimeSlot {
-  datetime: string;
-  engagement_level: string;
-  score: number;
-  reason: string;
-}
-
-export interface PlatformScheduleSuggestion {
-  platform: string;
-  best_time: ScheduleTimeSlot;
-  alternative_times: ScheduleTimeSlot[];
-  insights: string[];
 }
 
 export interface CaptionVariation {
@@ -280,34 +151,13 @@ export const postsApi = {
   getSmartSlots: (platform: string) =>
     api.get(`/posts/smart-slots/${platform}`),
 
-  getScheduleSuggestions: (platforms: string[]) =>
-    api.get<{
-      suggestions: Record<string, PlatformScheduleSuggestion>;
-      generated_at: string;
-    }>("/posts/schedule/suggestions", { params: { platforms: platforms.join(",") } }),
-
-  getOptimalTime: (platforms: string[]) =>
-    api.get<{
-      optimal_time: {
-        datetime: string;
-        engagement_level: string;
-        score: number;
-        reason: string;
-        platforms: string[];
-      };
-      generated_at: string;
-    }>("/posts/schedule/optimal-time", { params: { platforms: platforms.join(",") } }),
-
-  upload: (file: File, platforms?: string[]) => {
+  upload: (file: File) => {
     const formData = new FormData();
     formData.append("file", file);
     return api.post<{ url: string; filename: string; content_type: string; size: number }>(
       "/posts/upload",
       formData,
-      {
-        headers: { "Content-Type": "multipart/form-data" },
-        params: platforms && platforms.length > 0 ? { platforms: platforms.join(",") } : undefined,
-      }
+      { headers: { "Content-Type": "multipart/form-data" } }
     );
   },
 };
@@ -328,7 +178,7 @@ export const accountsApi = {
 
   sync: (id: string) => api.post(`/accounts/${id}/sync`),
 
-  syncLate: () => api.post<{ success: boolean; synced: SocialAccount[]; message: string }>("/accounts/sync/late"),
+  syncLate: () => api.post<{ success: boolean; synced: any[]; message: string }>("/accounts/sync/late"),
 };
 
 export const inboxApi = {
@@ -355,13 +205,16 @@ export const inboxApi = {
 };
 
 export const analyticsApi = {
-  getOverview: () => api.get<OverviewStats>("/analytics/overview"),
+  getOverview: (range: "7d" | "30d" | "90d" = "7d") =>
+    api.get<OverviewStats>("/analytics/overview", { params: { range } }),
 
   getGrowth: (platform?: string, days?: number) =>
-    api.get<GrowthData>("/analytics/growth", { params: { platform, days } }),
+    api.get("/analytics/growth", { params: { platform, days } }),
 
   getTopPosts: (days?: number, limit?: number) =>
-    api.get<TopPost[]>("/analytics/top-posts", { params: { days, limit } }),
+    api.get("/analytics/top-posts", { params: { days, limit } }),
+
+  getWeeklyReport: () => api.get("/analytics/weekly-report"),
 };
 
 export const aiApi = {
@@ -377,4 +230,11 @@ export const aiApi = {
     api.post<{ hashtags: string[] }>("/ai/generate-hashtags", null, {
       params: { content, platform, count },
     }),
+
+  optimizeContent: (content: string, targetPlatform: string) =>
+    api.post("/ai/optimize-content", null, {
+      params: { content, target_platform: targetPlatform },
+    }),
+
+  getCharacterLimits: () => api.get("/ai/character-limits"),
 };

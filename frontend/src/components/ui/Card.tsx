@@ -23,9 +23,9 @@ export function Card({
 
         // Variants
         variant === "default" && [
-          "bg-white/90 backdrop-blur-sm",
-          "border border-gray-100/80",
-          "shadow-lg shadow-black/[0.03]",
+          "bg-white/90 dark:bg-dark-surface backdrop-blur-sm",
+          "border border-gray-100/80 dark:border-dark-border",
+          "shadow-lg shadow-black/[0.03] dark:shadow-none",
         ],
 
         variant === "glass" && [
@@ -33,9 +33,9 @@ export function Card({
         ],
 
         variant === "elevated" && [
-          "bg-white",
-          "border border-gray-100/60",
-          "shadow-xl shadow-black/[0.06]",
+          "bg-white dark:bg-dark-surface",
+          "border border-gray-100/60 dark:border-dark-border",
+          "shadow-xl shadow-black/[0.06] dark:shadow-none",
         ],
 
         variant === "gradient" && [
@@ -77,8 +77,8 @@ export function CardHeader({
   return (
     <div
       className={cn(
-        "px-4 py-4 sm:px-6 sm:py-5",
-        "border-b border-gray-100/60",
+        "px-6 py-5",
+        "border-b border-gray-100/60 dark:border-dark-border",
         className
       )}
       {...props}
@@ -93,7 +93,7 @@ export function CardTitle({
   return (
     <h3
       className={cn(
-        "text-lg font-semibold text-gray-900",
+        "text-lg font-semibold text-gray-900 dark:text-surface-50",
         "font-display tracking-tight",
         className
       )}
@@ -109,7 +109,7 @@ export function CardDescription({
   return (
     <p
       className={cn(
-        "text-sm text-gray-500 mt-1.5",
+        "text-sm text-gray-500 dark:text-surface-400 mt-1.5",
         "leading-relaxed",
         className
       )}
@@ -124,10 +124,26 @@ export function CardContent({
 }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn("px-4 py-4 sm:px-6 sm:py-5", className)}
+      className={cn("px-6 py-5", className)}
       {...props}
     />
   );
 }
 
-
+export function CardFooter({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) {
+  return (
+    <div
+      className={cn(
+        "px-6 py-4",
+        "border-t border-gray-100/60 dark:border-dark-border",
+        "bg-gray-50/30 dark:bg-dark-border/30",
+        "rounded-b-2xl",
+        className
+      )}
+      {...props}
+    />
+  );
+}
