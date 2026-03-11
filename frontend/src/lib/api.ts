@@ -171,9 +171,10 @@ export const postsApi = {
   getScheduleSuggestions: (platforms: string[]) =>
     api.get(`/posts/schedule-suggestions`, { params: { platforms: platforms.join(",") } }),
 
-  upload: (file: File) => {
+  upload: (file: File, platforms?: string[]) => {
     const formData = new FormData();
     formData.append("file", file);
+    if (platforms?.length) formData.append("platforms", platforms.join(","));
     return api.post<{ url: string; filename: string; content_type: string; size: number }>(
       "/posts/upload",
       formData,
