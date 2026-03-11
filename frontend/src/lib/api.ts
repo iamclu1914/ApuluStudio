@@ -168,6 +168,9 @@ export const postsApi = {
   getSmartSlots: (platform: string) =>
     api.get(`/posts/smart-slots/${platform}`),
 
+  getScheduleSuggestions: (platforms: string[]) =>
+    api.get(`/posts/schedule-suggestions`, { params: { platforms: platforms.join(",") } }),
+
   upload: (file: File) => {
     const formData = new FormData();
     formData.append("file", file);
