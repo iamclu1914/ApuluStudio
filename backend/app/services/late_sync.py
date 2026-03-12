@@ -8,6 +8,7 @@ from sqlalchemy import select, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import get_settings
+from app.core.logger import logger
 from app.models.social_account import SocialAccount, Platform
 from app.services.platforms.late import LateService
 
@@ -44,6 +45,8 @@ async def sync_late_accounts_for_user(
     late_service = LateService(Platform.INSTAGRAM)
     accounts = await late_service.get_accounts(resolved_api_key)
 
+    logger.info("LATE sync: raw accounts received", count=len(accounts), accounts=accounts)
+
     for account in accounts:
         late_platform = account.get("platform", "").lower()
         platform = late_to_platform.get(late_platform)
@@ -61,11 +64,24 @@ async def sync_late_accounts_for_user(
         display_name = account.get("displayName") or account.get("display_name") or username
         avatar_url = account.get("profilePicture") or account.get("avatar") or account.get("profile_picture")
 
-        # Extract follower count from LATE metadata
+        # Extract follower count — LATE nests this inconsistently across platforms,
+        # so we check multiple possible locations and field names.
         metadata = account.get("metadata", {})
         profile_data = metadata.get("profileData", {})
-        follower_count = profile_data.get("followersCount", 0)
-        following_count = profile_data.get("followingCount", 0)
+
+        def _pick(*sources: dict, keys: list[str]) -> int:
+            for src in sources:
+                for k in keys:
+                    v = src.get(k)
+                    if v is not None and v != 0:
+                        return int(v)
+            return 0
+
+        follower_keys = ["followersCount", "followers_count", "followers", "followerCount"]
+        following_keys = ["followingCount", "following_count", "following", "followingCount"]
+
+        follower_count = _pick(profile_data, metadata, account, keys=follower_keys)
+        following_count = _pick(profile_data, metadata, account, keys=following_keys)
 
         # Skip avatar_url if too long (DB column is VARCHAR 500)
         # Truncating would break the URL, so we set it to None

@@ -784,12 +784,28 @@ class LateService(BasePlatformService):
                     message=f"No {self.platform.value} account connected in LATE",
                 )
 
+            # Follower count may be nested in metadata.profileData or at top level
+            metadata = account.get("metadata", {})
+            profile_data = metadata.get("profileData", {})
+            follower_keys = ["followersCount", "followers_count", "followers", "followerCount"]
+            following_keys = ["followingCount", "following_count", "following"]
+            followers = next(
+                (int(v) for src in [profile_data, metadata, account] for k in follower_keys if (v := src.get(k)) is not None),
+                0,
+            )
+            following = next(
+                (int(v) for src in [profile_data, metadata, account] for k in following_keys if (v := src.get(k)) is not None),
+                0,
+            )
+
             return {
                 "id": account.get("_id"),
                 "username": account.get("username"),
                 "display_name": account.get("displayName") or account.get("username"),
                 "avatar_url": account.get("profilePicture") or account.get("avatar"),
                 "platform": self.platform.value,
+                "followers_count": followers,
+                "following_count": following,
             }
         except PlatformError:
             raise
