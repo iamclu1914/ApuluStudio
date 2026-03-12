@@ -83,6 +83,24 @@ async def sync_late_accounts_for_user(
         follower_count = _pick(profile_data, metadata, account, keys=follower_keys)
         following_count = _pick(profile_data, metadata, account, keys=following_keys)
 
+        # Bluesky: LATE never stores follower counts — fetch from public API instead
+        if platform == Platform.BLUESKY and username:
+            try:
+                import httpx
+                handle = username
+                async with httpx.AsyncClient(timeout=10.0) as client:
+                    resp = await client.get(
+                        "https://public.api.bsky.app/xrpc/app.bsky.actor.getProfile",
+                        params={"actor": handle},
+                    )
+                    if resp.status_code == 200:
+                        bsky_data = resp.json()
+                        follower_count = bsky_data.get("followersCount", follower_count)
+                        following_count = bsky_data.get("followsCount", following_count)
+                        logger.info("Bluesky follower count fetched", handle=handle, followers=follower_count)
+            except Exception as e:
+                logger.warning("Could not fetch Bluesky follower count", handle=username, error=str(e))
+
         # Skip avatar_url if too long (DB column is VARCHAR 500)
         # Truncating would break the URL, so we set it to None
         if avatar_url and len(avatar_url) > 500:
