@@ -20,6 +20,12 @@ class OverviewStats(BaseModel):
     posts_this_week: int
     engagement_rate: float  # percentage
     platforms: list[PlatformStats]
+    # Extended fields for growth banner sparklines and trend indicators
+    followers_change_pct: float = 0.0
+    engagement_change_pct: float = 0.0
+    followers_sparkline: list[int] = []
+    engagement_sparkline: list[int] = []
+    platform_breakdown: list[dict] = []
 
 
 class GrowthDataPoint(BaseModel):

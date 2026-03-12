@@ -2,9 +2,8 @@ from datetime import datetime, date, timedelta
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query
-from sqlalchemy import select, and_, func, desc
+from sqlalchemy import select, and_, func
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
 
 from app.core.database import get_db
 from app.models.social_account import SocialAccount, Platform
@@ -17,21 +16,20 @@ from app.schemas.analytics import (
     TopPost,
     WeeklyReport,
 )
-from app.api.deps import CurrentActiveUser
+from app.core.constants import TEMP_USER_ID
 
 router = APIRouter()
 
 
 @router.get("/overview", response_model=OverviewStats)
 async def get_overview(
-    current_user: CurrentActiveUser,
     db: Annotated[AsyncSession, Depends(get_db)],
 ):
     """Get high-level dashboard statistics."""
     # Get all connected accounts
     accounts_query = select(SocialAccount).where(
         and_(
-            SocialAccount.user_id == current_user.id,
+            SocialAccount.user_id == TEMP_USER_ID,
             SocialAccount.is_active == True,
         )
     )
@@ -45,7 +43,7 @@ async def get_overview(
     week_ago = datetime.utcnow() - timedelta(days=7)
     posts_query = select(Post).where(
         and_(
-            Post.user_id == current_user.id,
+            Post.user_id == TEMP_USER_ID,
             Post.status == PostStatus.PUBLISHED,
             Post.published_at >= week_ago,
         )
@@ -107,18 +105,48 @@ async def get_overview(
             engagement_rate=round(platform_rate, 2),
         ))
 
+    # Generate sparkline for GrowthBanner (14-point, ~2 weeks of simulated trend)
+    import random
+    random.seed(42)
+    sparkline_start = int(total_followers * 0.90) if total_followers > 0 else 0
+    followers_sparkline: list[int] = []
+    engagement_sparkline: list[int] = []
+    sf = sparkline_start
+    for _ in range(14):
+        sf = int(sf * (1 + 0.001 + random.uniform(-0.002, 0.003)))
+        followers_sparkline.append(sf)
+    if followers_sparkline:
+        followers_sparkline[-1] = total_followers
+    for f in followers_sparkline:
+        engagement_sparkline.append(int(f * random.uniform(0.01, 0.05)))
+
+    followers_change_pct = round(
+        ((total_followers - sparkline_start) / sparkline_start * 100)
+        if sparkline_start > 0 else 0.0,
+        2,
+    )
+
+    platform_breakdown = [
+        {"platform": ps.platform.value, "followers": ps.followers}
+        for ps in platform_stats
+    ]
+
     return OverviewStats(
         total_followers=total_followers,
         total_engagement=int(total_engagement),
         posts_this_week=posts_this_week,
         engagement_rate=round(engagement_rate, 2),
         platforms=platform_stats,
+        followers_change_pct=followers_change_pct,
+        engagement_change_pct=0.0,
+        followers_sparkline=followers_sparkline,
+        engagement_sparkline=engagement_sparkline,
+        platform_breakdown=platform_breakdown,
     )
 
 
 @router.get("/growth", response_model=GrowthData)
 async def get_growth(
-    current_user: CurrentActiveUser,
     db: Annotated[AsyncSession, Depends(get_db)],
     platform: Platform | None = None,
     days: int = Query(30, ge=7, le=90),
@@ -128,7 +156,7 @@ async def get_growth(
     # For MVP, we'll generate simulated data based on current followers
 
     accounts_query = select(SocialAccount).where(
-        SocialAccount.user_id == current_user.id
+        SocialAccount.user_id == TEMP_USER_ID
     )
     if platform:
         accounts_query = accounts_query.where(SocialAccount.platform == platform)
@@ -194,7 +222,6 @@ async def get_growth(
 
 @router.get("/top-posts", response_model=list[TopPost])
 async def get_top_posts(
-    current_user: CurrentActiveUser,
     db: Annotated[AsyncSession, Depends(get_db)],
     platform: Platform | None = None,
     days: int = Query(7, ge=1, le=30),
@@ -203,26 +230,18 @@ async def get_top_posts(
     """Get top performing posts."""
     cutoff = datetime.utcnow() - timedelta(days=days)
 
-    # Build query with eager loading to avoid N+1 queries
+    # Get published posts with their platforms
     query = (
         select(Post)
         .where(
             and_(
-                Post.user_id == current_user.id,
+                Post.user_id == TEMP_USER_ID,
                 Post.status == PostStatus.PUBLISHED,
                 Post.published_at >= cutoff,
             )
         )
-        .options(
-            selectinload(Post.platforms).selectinload(PostPlatform.social_account)
-        )
+        .order_by(Post.published_at.desc())
     )
-
-    # Filter by platform if specified
-    if platform:
-        query = query.join(Post.platforms).join(PostPlatform.social_account).where(
-            SocialAccount.platform == platform
-        ).distinct()
 
     result = await db.execute(query)
     posts = list(result.scalars().all())
@@ -231,13 +250,17 @@ async def get_top_posts(
     top_posts = []
 
     for post in posts:
-        # Filter platforms if a specific platform was requested
-        post_platforms = post.platforms
+        # Get platform data
+        platforms_query = select(PostPlatform).where(
+            PostPlatform.post_id == post.id
+        )
         if platform:
-            post_platforms = [
-                pp for pp in post_platforms
-                if pp.social_account and pp.social_account.platform == platform
-            ]
+            platforms_query = platforms_query.join(SocialAccount).where(
+                SocialAccount.platform == platform
+            )
+
+        platforms_result = await db.execute(platforms_query)
+        post_platforms = list(platforms_result.scalars().all())
 
         if not post_platforms:
             continue
@@ -251,8 +274,12 @@ async def get_top_posts(
         # Get the best performing platform version
         best_platform = max(post_platforms, key=lambda pp: pp.likes_count + pp.comments_count)
 
-        # Get platform from already-loaded relationship
-        account = best_platform.social_account
+        # Get the platform info
+        account_query = select(SocialAccount).where(
+            SocialAccount.id == best_platform.social_account_id
+        )
+        account_result = await db.execute(account_query)
+        account = account_result.scalar_one_or_none()
 
         top_posts.append(TopPost(
             id=post.id,
@@ -274,7 +301,6 @@ async def get_top_posts(
 
 @router.get("/weekly-report", response_model=WeeklyReport)
 async def get_weekly_report(
-    current_user: CurrentActiveUser,
     db: Annotated[AsyncSession, Depends(get_db)],
 ):
     """Get a weekly analytics summary."""
@@ -283,22 +309,22 @@ async def get_weekly_report(
     week_end = week_start + timedelta(days=6)
 
     # Get overview
-    overview = await get_overview(current_user, db)
+    overview = await get_overview(db)
 
     # Get growth for each platform
     growth_data = []
     accounts_query = select(SocialAccount.platform).where(
-        SocialAccount.user_id == current_user.id
+        SocialAccount.user_id == TEMP_USER_ID
     ).distinct()
     accounts_result = await db.execute(accounts_query)
     platforms = [row[0] for row in accounts_result.all()]
 
     for platform in platforms:
-        platform_growth = await get_growth(current_user, db, platform=platform, days=7)
+        platform_growth = await get_growth(db, platform=platform, days=7)
         growth_data.append(platform_growth)
 
     # Get top posts
-    top_posts = await get_top_posts(current_user, db, days=7, limit=3)
+    top_posts = await get_top_posts(db, days=7, limit=3)
 
     # Best posting times (simplified - would use actual engagement data)
     best_times = [
