@@ -381,7 +381,10 @@ class MediaProcessor:
         aspect_ratio: AspectRatio
     ) -> Image.Image:
         """
-        Crop image to a specific aspect ratio (center crop).
+        Crop image to a specific aspect ratio using top-biased crop.
+
+        Uses a top-biased strategy (25% from top) instead of center crop
+        to preserve heads/faces in character art and portraits.
         """
         # Parse aspect ratio
         if aspect_ratio == AspectRatio.SQUARE:
@@ -403,14 +406,16 @@ class MediaProcessor:
             return img  # Already correct ratio
 
         if current_ratio > target_ratio:
-            # Image is too wide, crop width
+            # Image is too wide, crop width (center is fine for horizontal)
             new_width = int(img.height * target_ratio)
             left = (img.width - new_width) // 2
             img = img.crop((left, 0, left + new_width, img.height))
         else:
-            # Image is too tall, crop height
+            # Image is too tall, crop height from the BOTTOM
+            # Use 25% from top as the anchor point so heads stay visible
             new_height = int(img.width / target_ratio)
-            top = (img.height - new_height) // 2
+            max_top = img.height - new_height
+            top = min(int(max_top * 0.25), max_top)
             img = img.crop((0, top, img.width, top + new_height))
 
         return img

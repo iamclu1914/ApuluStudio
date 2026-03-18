@@ -245,7 +245,7 @@ export function ComposeArea({
                 key={i}
                 className="relative w-20 h-20 rounded-lg overflow-hidden border border-surface-200 dark:border-dark-border"
               >
-                <img src={src} alt="" className="w-full h-full object-cover" />
+                <img src={src} alt="" className="w-full h-full object-cover object-top" />
                 <button
                   onClick={() => removeMedia(i)}
                   className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/60 flex items-center justify-center"
