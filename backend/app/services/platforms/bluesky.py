@@ -173,10 +173,15 @@ class BlueskyService(BasePlatformService):
             # Upload the image blob (sync operation)
             upload = await self._run_sync(client.upload_blob, img_data)
 
-            # Create post with image embed
+            # Create post with image embed (include aspect ratio so Bluesky displays correctly)
+            aspect_ratio = models.AppBskyEmbedDefs.AspectRatio(
+                width=processed.width,
+                height=processed.height,
+            )
             images = [models.AppBskyEmbedImages.Image(
                 alt=alt_text or "Image uploaded via Apulu Studio",
                 image=upload.blob,
+                aspect_ratio=aspect_ratio,
             )]
             embed = models.AppBskyEmbedImages.Main(images=images)
 
