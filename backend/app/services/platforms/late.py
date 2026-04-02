@@ -457,8 +457,12 @@ class LateService(BasePlatformService):
             }
 
             # Add Instagram-specific post type (feed, story, reel)
-            if self.platform == Platform.INSTAGRAM and post_type:
-                platform_config["postType"] = post_type.lower()
+            # Auto-detect: video uploads default to "reel" for Instagram
+            if self.platform == Platform.INSTAGRAM:
+                if post_type:
+                    platform_config["postType"] = post_type.lower()
+                elif media_type == "video":
+                    platform_config["postType"] = "reel"
 
             payload = {
                 "content": content,
