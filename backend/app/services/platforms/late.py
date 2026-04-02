@@ -443,9 +443,11 @@ class LateService(BasePlatformService):
                     )
                 late_account_id = account.get("_id")
 
-            # Build request payload using correct LATE API format
+            # Build request payload — auto-detect media type from URL
+            video_exts = (".mp4", ".mov", ".webm", ".avi", ".mkv")
+            media_type = "video" if any(image_url.lower().endswith(ext) for ext in video_exts) else "image"
             media_item = {
-                "type": "image",
+                "type": media_type,
                 "url": image_url,
             }
 
