@@ -327,22 +327,22 @@ class LateService(BasePlatformService):
                 late_account_id = account.get("_id")
 
             # Build request payload using correct LATE API format
-            payload = {
-                "content": content,
-                "platforms": [
-                    {
-                        "platform": platform_type,
-                        "accountId": late_account_id,
-                    }
-                ],
-                "publishNow": scheduled_at is None,
+            platform_entry = {
+                "platform": platform_type,
+                "accountId": late_account_id,
             }
 
-            # Threads: attach topic tag for discoverability
+            # Threads: attach topic tag inside platform entry for discoverability
             _topic = kwargs.get("topic_tag")
             if self.platform == Platform.THREADS and _topic:
                 _tag = _topic.replace(".", "").replace("&", "")[:50]
-                payload["platformSpecificData"] = {"topic_tag": _tag}
+                platform_entry["platformSpecificData"] = {"topic_tag": _tag}
+
+            payload = {
+                "content": content,
+                "platforms": [platform_entry],
+                "publishNow": scheduled_at is None,
+            }
 
             # Add scheduling if provided
             if scheduled_at:
@@ -471,6 +471,12 @@ class LateService(BasePlatformService):
                 elif media_type == "video":
                     platform_config["postType"] = "reel"
 
+            # Threads: attach topic tag inside platform entry
+            _topic = topic_tag or kwargs.get("topic_tag")
+            if self.platform == Platform.THREADS and _topic:
+                _tag = _topic.replace(".", "").replace("&", "")[:50]
+                platform_config["platformSpecificData"] = {"topic_tag": _tag}
+
             payload = {
                 "content": content,
                 "mediaItems": [media_item],
@@ -481,12 +487,6 @@ class LateService(BasePlatformService):
             # Add scheduling if provided
             if scheduled_at:
                 payload["scheduledFor"] = scheduled_at.isoformat()
-
-            # Threads: attach topic tag for discoverability
-            _topic = topic_tag or kwargs.get("topic_tag")
-            if self.platform == Platform.THREADS and _topic:
-                _tag = _topic.replace(".", "").replace("&", "")[:50]
-                payload["platformSpecificData"] = {"topic_tag": _tag}
 
             # Add TikTok-specific settings if posting to TikTok
             if self.platform == Platform.TIKTOK:
