@@ -338,6 +338,12 @@ class LateService(BasePlatformService):
                 "publishNow": scheduled_at is None,
             }
 
+            # Threads: attach topic tag for discoverability
+            _topic = kwargs.get("topic_tag")
+            if self.platform == Platform.THREADS and _topic:
+                _tag = _topic.replace(".", "").replace("&", "")[:50]
+                payload["platformSpecificData"] = {"topic_tag": _tag}
+
             # Add scheduling if provided
             if scheduled_at:
                 payload["scheduledFor"] = scheduled_at.isoformat()
@@ -412,6 +418,7 @@ class LateService(BasePlatformService):
         alt_text: str = "",
         scheduled_at: datetime = None,
         post_type: str = None,  # "feed", "story", "reel" for Instagram
+        topic_tag: str = None,  # Threads topic tag for discoverability
         **kwargs: Any,
     ) -> PostResult:
         """
@@ -474,6 +481,12 @@ class LateService(BasePlatformService):
             # Add scheduling if provided
             if scheduled_at:
                 payload["scheduledFor"] = scheduled_at.isoformat()
+
+            # Threads: attach topic tag for discoverability
+            _topic = topic_tag or kwargs.get("topic_tag")
+            if self.platform == Platform.THREADS and _topic:
+                _tag = _topic.replace(".", "").replace("&", "")[:50]
+                payload["platformSpecificData"] = {"topic_tag": _tag}
 
             # Add TikTok-specific settings if posting to TikTok
             if self.platform == Platform.TIKTOK:
