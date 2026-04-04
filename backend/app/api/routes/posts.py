@@ -353,13 +353,18 @@ async def create_post(
         else:
             scheduled_at_naive = data.scheduled_at
 
+    # If threads_topic provided, store it as a tagged hashtag for the publisher
+    hashtags = data.hashtags or []
+    if data.threads_topic:
+        hashtags.append(f"__threads_topic:{data.threads_topic}")
+
     post = Post(
         id=str(uuid.uuid4()),
         user_id=current_user.id,
         content=data.content,
         post_type=data.post_type,
         media_urls=data.media_urls,
-        hashtags=data.hashtags,
+        hashtags=hashtags if hashtags else None,
         scheduled_at=scheduled_at_naive,
         status=status,
         ai_generated=data.ai_generated,

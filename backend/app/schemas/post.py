@@ -19,6 +19,9 @@ class PostCreate(BaseModel):
     ai_generated: bool = False
     ai_prompt: str | None = None
 
+    # Threads topic for discoverability (1-50 chars, no periods or ampersands)
+    threads_topic: str | None = None
+
 
 class PostUpdate(BaseModel):
     """Schema for updating a post."""

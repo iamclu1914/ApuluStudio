@@ -113,6 +113,14 @@ class PostPublisher:
             # Determine Instagram post type from post.post_type
             instagram_post_type = self._get_instagram_post_type(account.platform, post)
 
+            # Extract Threads topic from tagged hashtags
+            threads_topic = None
+            if post.hashtags:
+                for h in post.hashtags:
+                    if isinstance(h, str) and h.startswith("__threads_topic:"):
+                        threads_topic = h.replace("__threads_topic:", "")
+                        break
+
             if post.media_urls and len(post.media_urls) > 0:
                 # Process image with auto-cropping if needed
                 image_url = await self._process_media_for_platform(
@@ -131,6 +139,7 @@ class PostPublisher:
                     handle=account.username,
                     person_urn=f"urn:li:person:{account.platform_user_id}",
                     post_type=instagram_post_type,
+                    topic_tag=threads_topic,
                 )
             else:
                 # Text-only post
@@ -141,6 +150,7 @@ class PostPublisher:
                     page_id=account.page_id,
                     handle=account.username,
                     person_urn=f"urn:li:person:{account.platform_user_id}",
+                    topic_tag=threads_topic,
                 )
 
             # Update platform post status
