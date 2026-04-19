@@ -26,11 +26,48 @@ class StorageService:
     BUCKET_NAME = "media"
     ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/gif", "image/webp"}
     ALLOWED_VIDEO_TYPES = {"video/mp4", "video/quicktime", "video/webm"}
-    MAX_IMAGE_SIZE = 10 * 1024 * 1024  # 10MB
+    MAX_IMAGE_SIZE = 25 * 1024 * 1024  # 25MB raw upload tolerance
+    PROCESSING_SIZE_LIMIT = 8 * 1024 * 1024  # 8MB — downsized to this before any crop/processing to stay under Render dyno memory
     MAX_VIDEO_SIZE = 100 * 1024 * 1024  # 100MB
 
     def __init__(self):
         self.client = get_supabase_admin()
+
+    @classmethod
+    def _downsize_bytes(cls, data: bytes, max_bytes: int | None = None) -> tuple[bytes, str]:
+        """Downsize image bytes to stay under max_bytes. Returns (bytes, content_type).
+
+        Keeps the original data if it's already under the limit. Re-encodes as JPEG
+        when resize is needed. Safe to call on any supported image format.
+        """
+        limit = max_bytes or cls.PROCESSING_SIZE_LIMIT
+        if len(data) <= limit:
+            return data, ""  # caller keeps original content_type
+        img = Image.open(io.BytesIO(data))
+        if img.mode in ("RGBA", "P", "LA"):
+            background = Image.new("RGB", img.size, (255, 255, 255))
+            if img.mode == "P":
+                img = img.convert("RGBA")
+            if img.mode in ("RGBA", "LA"):
+                background.paste(img, mask=img.split()[-1])
+            else:
+                background.paste(img)
+            img = background
+        elif img.mode != "RGB":
+            img = img.convert("RGB")
+        max_dim = 2560
+        if max(img.size) > max_dim:
+            img.thumbnail((max_dim, max_dim))
+        quality = 90
+        while quality >= 50:
+            buf = io.BytesIO()
+            img.save(buf, format="JPEG", quality=quality, optimize=True)
+            out = buf.getvalue()
+            if len(out) <= limit:
+                return out, "image/jpeg"
+            quality -= 10
+        # If still over limit at quality 50, accept it — better than failing.
+        return out, "image/jpeg"
 
     async def upload_image(
         self,
@@ -55,6 +92,12 @@ class StorageService:
 
         if len(file_data) > self.MAX_IMAGE_SIZE:
             raise ValueError(f"Image too large. Max size: {self.MAX_IMAGE_SIZE // 1024 // 1024}MB")
+
+        # Auto-downsize before crop/upload to stay under dyno memory on Render
+        downsized, new_ct = self._downsize_bytes(file_data)
+        if new_ct:
+            file_data = downsized
+            content_type = new_ct
 
         # Auto-crop if aspect ratio specified
         processed_data = file_data
@@ -109,6 +152,12 @@ class StorageService:
 
         if len(file_data) > self.MAX_IMAGE_SIZE:
             raise ValueError(f"Image too large. Max size: {self.MAX_IMAGE_SIZE // 1024 // 1024}MB")
+
+        # Auto-downsize before variants/crop to stay under dyno memory on Render
+        downsized, new_ct = self._downsize_bytes(file_data)
+        if new_ct:
+            file_data = downsized
+            content_type = new_ct
 
         variants = variants or {}
 
